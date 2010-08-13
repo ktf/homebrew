@@ -23,7 +23,7 @@ class Rpm <Formula
     patches << "http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/COMP/CMSDIST/rpm-4.8.0-allow-empty-buildroot.patch?revision=HEAD" 
     patches << "http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/COMP/CMSDIST/rpm-4.8.0-fix-missing-libgen.patch?revision=HEAD"
     patches << "http://cmssw.cvs.cern.ch/cgi-bin/cmssw.cgi/COMP/CMSDIST/rpm-4.8.0-fix-find-provides.patch?revision=HEAD"
-    patches
+    patches << DATA
   end
   
   def install
@@ -45,3 +45,31 @@ EOF
     system "perl -p -i -e 's|^.buildroot|#%%buildroot|' #{prefix}/lib/rpm/macros"
   end
 end
+
+__END__
+diff --git a/build/parseSpec.c b/build/parseSpec.c
+index 816aa81..9ba62ac 100644
+--- a/build/parseSpec.c
++++ b/build/parseSpec.c
+@@ -223,7 +223,7 @@ retry:
+ 
+     /* Make sure we have something in the read buffer */
+     if (!(ofi->readPtr && *(ofi->readPtr))) {
+-	if (!fgets(ofi->readBuf, BUFSIZ, ofi->fp)) {
++	if (!fgets(ofi->readBuf, 20*BUFSIZ, ofi->fp)) {
+ 	    /* EOF */
+ 	    if (spec->readStack->next) {
+ 		rpmlog(RPMLOG_ERR, _("Unclosed %%if\n"));
+diff --git a/build/rpmspec.h b/build/rpmspec.h
+index c944677..b026321 100644
+--- a/build/rpmspec.h
++++ b/build/rpmspec.h
+@@ -57,7 +57,7 @@ typedef struct OpenFileInfo {
+     char * fileName;
+     FILE *fp;
+     int lineNum;
+-    char readBuf[BUFSIZ];
++    char readBuf[20*BUFSIZ];
+     char * readPtr;
+     struct OpenFileInfo * next;
+ } OFI_t;
