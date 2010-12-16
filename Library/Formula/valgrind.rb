@@ -9,7 +9,6 @@ class Valgrind <Formula
   head "svn://svn.valgrind.org/valgrind/trunk"
 
   depends_on 'pkg-config' => :build
-  depends_on 'boost'
 
   skip_clean 'lib'
 
